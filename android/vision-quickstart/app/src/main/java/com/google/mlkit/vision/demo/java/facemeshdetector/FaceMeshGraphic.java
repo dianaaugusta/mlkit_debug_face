@@ -19,15 +19,21 @@ package com.google.mlkit.vision.demo.java.facemeshdetector;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.common.Triangle;
 import com.google.mlkit.vision.demo.GraphicOverlay;
 import com.google.mlkit.vision.demo.GraphicOverlay.Graphic;
+import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.preference.PreferenceUtils;
 import com.google.mlkit.vision.facemesh.FaceMesh;
 import com.google.mlkit.vision.facemesh.FaceMesh.ContourType;
@@ -48,10 +54,14 @@ public class FaceMeshGraphic extends Graphic {
 
   private final Paint positionPaint;
   private final Paint boxPaint;
+
+  private final Paint textPaint;
   private volatile FaceMesh faceMesh;
   private final int useCase;
   private float zMin;
   private float zMax;
+
+  private GraphicOverlay graphicOverlay;
 
   @ContourType
   private static final int[] DISPLAY_CONTOURS = {
@@ -69,8 +79,9 @@ public class FaceMeshGraphic extends Graphic {
     FaceMesh.NOSE_BRIDGE
   };
 
-  FaceMeshGraphic(GraphicOverlay overlay, FaceMesh faceMesh) {
+  FaceMeshGraphic( GraphicOverlay overlay, FaceMesh faceMesh) {
     super(overlay);
+
 
     this.faceMesh = faceMesh;
     final int selectedColor = Color.WHITE;
@@ -83,7 +94,15 @@ public class FaceMeshGraphic extends Graphic {
     boxPaint.setStyle(Style.STROKE);
     boxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
+    textPaint = new Paint();
+    textPaint.setColor( Color.WHITE);
+    textPaint.setTextSize(40F);
+    textPaint.setShadowLayer(5.0f, 0f, 0f, Color.BLACK);
+
+
     useCase = PreferenceUtils.getFaceMeshUseCase(getApplicationContext());
+
+    graphicOverlay = overlay;
   }
 
   /** Draws the face annotations for position on the supplied canvas. */
@@ -118,32 +137,65 @@ public class FaceMeshGraphic extends Graphic {
 
     // Draw face mesh points
     for (FaceMeshPoint point : points) {
+
       updatePaintColorByZValue(
-          positionPaint,
-          canvas,
-          /* visualizeZ= */ true,
-          /* rescaleZForVisualization= */ true,
-          point.getPosition().getZ(),
-          zMin,
-          zMax);
-      canvas.drawCircle(
-          translateX(point.getPosition().getX()),
-          translateY(point.getPosition().getY()),
-          FACE_POSITION_RADIUS,
-          positionPaint);
+              positionPaint,
+              canvas,
+              /* visualizeZ= */ true,
+              /* rescaleZForVisualization= */ true,
+              point.getPosition().getZ(),
+              zMin,
+              zMax);
+      //um terço do nariz
+      updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(6));
+      //ponta sobrancelha esquerda
+      updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(46));
+      //ponta sobrancelha direita
+      updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(276));
+      //distancia mais proxima da orelha esquerda
+      updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(127));
+      //distancia mais proxima da orelha direita
+      updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(389));
+
     }
 
     if (useCase == FaceMeshDetectorOptions.FACE_MESH) {
       // Draw face mesh triangles
+      //(ponto 0 - ponto da distancia)
+      //(ponto 1 - ponto 0 )
+      //(ponto 2 - ponto 0)
+      // e normalizar distancia
       for (Triangle<FaceMeshPoint> triangle : triangles) {
         List<FaceMeshPoint> faceMeshPoints = triangle.getAllPoints();
-        PointF3D point1 = faceMeshPoints.get(0).getPosition();
-        PointF3D point2 = faceMeshPoints.get(1).getPosition();
-        PointF3D point3 = faceMeshPoints.get(2).getPosition();
 
-        drawLine(canvas, point1, point2);
-        drawLine(canvas, point2, point3);
-        drawLine(canvas, point3, point1);
+        //tracejando uma linha entre o ponto proximo da orelha ate a ponta da sombrancelha esquerda
+       drawLine(canvas, points.get(46).getPosition(), points.get(127).getPosition());
+
+        //tracejando uma linha entre o ponto proximo da orelha ate a ponta da sombrancelha esquerda
+        drawLine(canvas, points.get(276).getPosition(), points.get(389).getPosition());
+
+        //tracejando uma linha através do olho esquerdo
+        drawLine(canvas, points.get(159).getPosition(), points.get(145).getPosition());
+
+        //tracejando uma linha através do olho esquerdo
+        drawLine(canvas, points.get(386).getPosition(), points.get(374).getPosition());
+
+        if (points.size() > 10) {
+          PointF3D point5 = points.get(5).getPosition();
+          PointF3D point10 = points.get(10).getPosition();
+          PointF3D point0 = points.get(0).getPosition();
+          //drawLineBetweenPoints(canvas, point5, point10);
+          float distance = calculateDistanceBetweenPoints(
+                  point5, point10, points.get(0).getPosition());
+
+         // convertPixelsToCm("distance");
+          canvas.drawText(
+                  String.valueOf(translateX(distance)),
+                  00F  * 1.5f,
+                  500F  * 1.5f,
+                  textPaint);
+
+        }
       }
     }
   }
@@ -172,4 +224,107 @@ public class FaceMeshGraphic extends Graphic {
         translateY(point2.getY()),
         positionPaint);
   }
+
+  private void drawLine(Canvas canvas, PointF3D point1, PointF3D point2, PointF3D point3, PointF3D point4, PointF3D point5) {
+
+    canvas.drawLine(
+            translateX(point1.getX()),
+            translateY(point1.getY()),
+            translateX(point2.getX()),
+            translateY(point2.getY()),
+            positionPaint);
+    canvas.drawLine(
+            translateX(point2.getX()),
+            translateY(point2.getY()),
+            translateX(point3.getX()),
+            translateY(point3.getY()),
+            positionPaint);
+    canvas.drawLine(
+            translateX(point3.getX()),
+            translateY(point3.getY()),
+            translateX(point4.getX()),
+            translateY(point4.getY()),
+            positionPaint);
+    canvas.drawLine(
+            translateX(point4.getX()),
+            translateY(point4.getY()),
+            translateX(point5.getX()),
+            translateY(point5.getY()),
+            positionPaint);
+  }
+
+
+
+  private void drawSquare(Canvas canvas,
+                          PointF3D point1,
+                          PointF3D point2,
+                          PointF3D point3,
+                          PointF3D point4) {
+    // Desenhar as linhas que formam o quadrado
+    drawLine(canvas, point1, point2);
+    drawLine(canvas, point2, point3);
+    drawLine(canvas, point3, point4);
+    drawLine(canvas, point4, point1);
+  }
+
+  private void drawLineBetweenPoints(Canvas canvas, PointF3D point1, PointF3D point2) {
+    // Define a cor para a linha
+    Paint linePaint = new Paint();
+    linePaint.setColor(Color.RED);
+    linePaint.setStyle(Style.STROKE);
+    linePaint.setStrokeWidth(BOX_STROKE_WIDTH);
+
+    // Desenha a linha entre os dois pontos
+    canvas.drawLine(
+            translateX(point1.getX()),
+            translateY(point1.getY()),
+            translateX(point2.getX()),
+            translateY(point2.getY()),
+            linePaint);
+  }
+
+  private float calculateDistanceBetweenPoints(PointF3D point1, PointF3D point2, PointF3D point0) {
+    float dx = point2.getX() - point1.getX();
+    float dy = point2.getY() - point1.getY();
+    float dz = point2.getZ() - point1.getZ();
+
+    float offsetX = point0.getX() * 2;
+    float offsetY = point0.getY() * 2 ;
+    float offsetZ = point0.getZ() * 2 ;
+
+    return (float) Math.sqrt(
+            (offsetX - dx) * (offsetX - dx)
+            + (offsetY - dy) * (offsetY  - dy)
+            + (offsetZ - dz) * (offsetZ  - dz)
+    );
+  }
+
+
+  public float convertPixelsToCm(float px) {
+    // Obtenha a densidade de pixels padrão do sistema (160 dpi)
+    float density = Resources.getSystem().getDisplayMetrics().density;
+
+    // Calcule a conversão de pixels para centímetros
+    float cm = px / (density * 160 / 2.54f);
+
+    return cm;
+  }
+  public void updatePaintAndDrawCircle(Paint positionPaint, Canvas canvas, float zMin, float zMax, FaceMeshPoint point ) {
+    updatePaintColorByZValue(
+            positionPaint,
+            canvas,
+            /* visualizeZ= */ true,
+            /* rescaleZForVisualization= */ true,
+            point.getPosition().getZ(),
+            zMin,
+            zMax);
+
+    canvas.drawCircle(
+            translateX(point.getPosition().getX()),
+            translateY(point.getPosition().getY()),
+            FACE_POSITION_RADIUS,
+            positionPaint);
+  }
+
+
 }

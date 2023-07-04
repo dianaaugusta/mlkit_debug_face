@@ -106,7 +106,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     Spinner spinner = findViewById(R.id.spinner);
     List<String> options = new ArrayList<>();
-    options.add(OBJECT_DETECTION);
+    /*options.add(OBJECT_DETECTION);
     options.add(OBJECT_DETECTION_CUSTOM);
     options.add(CUSTOM_AUTOML_OBJECT_DETECTION);
     options.add(FACE_DETECTION);
@@ -120,7 +120,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     options.add(TEXT_RECOGNITION_CHINESE);
     options.add(TEXT_RECOGNITION_DEVANAGARI);
     options.add(TEXT_RECOGNITION_JAPANESE);
-    options.add(TEXT_RECOGNITION_KOREAN);
+    options.add(TEXT_RECOGNITION_KOREAN);*/
     options.add(FACE_MESH_DETECTION);
 
     // Creating adapter for spinner
@@ -184,7 +184,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     try {
       switch (model) {
-        case OBJECT_DETECTION:
+        /*case OBJECT_DETECTION:
           Log.i(TAG, "Using Object Detector Processor");
           ObjectDetectorOptions objectDetectorOptions =
               PreferenceUtils.getObjectDetectorOptionsForLivePreview(this);
@@ -293,11 +293,11 @@ public final class LivePreviewActivity extends AppCompatActivity
                   visualizeZ,
                   rescaleZ,
                   runClassification,
-                  /* isStreamMode = */ true));
+                  /* isStreamMode = true));
           break;
         case SELFIE_SEGMENTATION:
           cameraSource.setMachineLearningFrameProcessor(new SegmenterProcessor(this));
-          break;
+          break; */
         case FACE_MESH_DETECTION:
           cameraSource.setMachineLearningFrameProcessor(new FaceMeshDetectorProcessor(this));
           break;

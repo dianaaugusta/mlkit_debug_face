@@ -18,11 +18,13 @@ package com.google.mlkit.vision.demo.java.facemeshdetector;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
-import com.google.android.odml.image.MlImage;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.demo.GraphicOverlay;
+import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.java.VisionProcessorBase;
 import com.google.mlkit.vision.demo.preference.PreferenceUtils;
 import com.google.mlkit.vision.facemesh.FaceMesh;
@@ -63,6 +65,7 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
   protected void onSuccess(
       @NonNull List<FaceMesh> faces, @NonNull GraphicOverlay graphicOverlay) {
     for (FaceMesh face : faces) {
+
       graphicOverlay.add(new FaceMeshGraphic(graphicOverlay, face));
     }
   }

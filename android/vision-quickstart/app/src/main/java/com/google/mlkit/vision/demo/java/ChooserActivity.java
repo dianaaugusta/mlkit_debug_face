@@ -47,9 +47,9 @@ public final class ChooserActivity extends AppCompatActivity
           }
           : new Class<?>[] {
             LivePreviewActivity.class,
-            StillImageActivity.class,
-            CameraXLivePreviewActivity.class,
-            CameraXSourceDemoActivity.class,
+            //StillImageActivity.class,
+           // CameraXLivePreviewActivity.class,
+           // CameraXSourceDemoActivity.class,
           };
 
   private static final int[] DESCRIPTION_IDS =
@@ -59,9 +59,9 @@ public final class ChooserActivity extends AppCompatActivity
           }
           : new int[] {
             R.string.desc_camera_source_activity,
-            R.string.desc_still_image_activity,
-            R.string.desc_camerax_live_preview_activity,
-            R.string.desc_cameraxsource_demo_activity,
+            //R.string.desc_still_image_activity,
+           // R.string.desc_camerax_live_preview_activity,
+            //R.string.desc_cameraxsource_demo_activity,
           };
 
   @Override
