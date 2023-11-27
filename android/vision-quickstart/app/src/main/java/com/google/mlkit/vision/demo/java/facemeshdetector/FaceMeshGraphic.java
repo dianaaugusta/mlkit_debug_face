@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -54,6 +55,10 @@ public class FaceMeshGraphic extends Graphic {
 
   private final Paint positionPaint;
   private final Paint boxPaint;
+  boolean samePerson = true;
+
+  private boolean verificationDone = false;
+  private boolean pointsDetected = false;
 
   private final Paint textPaint;
   private volatile FaceMesh faceMesh;
@@ -123,10 +128,41 @@ public class FaceMeshGraphic extends Graphic {
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, boxPaint);
 
-    // Draw face mesh
-    List<FaceMeshPoint> points =
-        useCase == USE_CASE_CONTOUR_ONLY ? getContourPoints(faceMesh) : faceMesh.getAllPoints();
+    List<FaceMeshPoint> points = new ArrayList<>();
+
+    if (!pointsDetected) {
+      // Draw face mesh e obtenha os pontos faciais
+            points = useCase == USE_CASE_CONTOUR_ONLY ? getContourPoints(faceMesh) : faceMesh.getAllPoints();
+
+      // Verifica se os pontos foram detectados
+      if (!points.isEmpty()) {
+        pointsDetected = true; // Marca que os pontos foram detectados
+
+        // Realiza a verificação apenas uma vez após a detecção dos pontos
+        samePersonVerification(points, points);
+        if(samePerson){
+          canvas.drawText("Same Person" , 00F  * 1.5f,
+                  500F  * 1.5f, textPaint);
+        }
+      }
+    }
+
+    //
     List<Triangle<FaceMeshPoint>> triangles = faceMesh.getAllTriangles();
+
+    if (!pointsDetected && !points.isEmpty()) {
+      pointsDetected = true; // Marca que os pontos foram detectados
+
+      // Marca que a verificação não foi feita para permitir que ocorra uma vez
+      verificationDone = false;
+    }
+
+    // Verifica se a verificação de mesma pessoa já foi feita e se os pontos foram detectados
+    if (!verificationDone && pointsDetected) {
+      samePersonVerification(points, points);
+      verificationDone = true;
+    }
+
 
     zMin = Float.MAX_VALUE;
     zMax = Float.MIN_VALUE;
@@ -137,6 +173,9 @@ public class FaceMeshGraphic extends Graphic {
 
     // Draw face mesh points
     for (FaceMeshPoint point : points) {
+      List<FaceMeshPoint> pointsA = points;
+      List<FaceMeshPoint> pointsB = points;
+      Log.e("TAG", String.valueOf(points.size()));
 
       updatePaintColorByZValue(
               positionPaint,
@@ -156,6 +195,7 @@ public class FaceMeshGraphic extends Graphic {
       updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(127));
       //distancia mais proxima da orelha direita
       updatePaintAndDrawCircle(positionPaint, canvas, zMin, zMax, points.get(389));
+
 
     }
 
@@ -189,11 +229,11 @@ public class FaceMeshGraphic extends Graphic {
                   point5, point10, points.get(0).getPosition());
 
          // convertPixelsToCm("distance");
-          canvas.drawText(
-                  String.valueOf(translateX(distance)),
-                  00F  * 1.5f,
-                  500F  * 1.5f,
-                  textPaint);
+//          canvas.drawText(
+//                  String.valueOf(translateX(distance)),
+//                  00F  * 1.5f,
+//                  500F  * 1.5f,
+//                  textPaint);
 
         }
       }
@@ -326,5 +366,30 @@ public class FaceMeshGraphic extends Graphic {
             positionPaint);
   }
 
+  public void samePersonVerification(List<FaceMeshPoint> pointsA, List<FaceMeshPoint> pointsB){
+    if (pointsA.size() != pointsB.size()) {
+      samePerson = false;
+    } else {
+      for (int i = 0; i < pointsA.size(); i++) {
+        FaceMeshPoint pointA = pointsA.get(i);
+        FaceMeshPoint pointB = pointsB.get(i);
+
+
+        if (pointA.getPosition().getX() != pointB.getPosition().getX() ||
+                pointA.getPosition().getY() != pointB.getPosition().getY() ||
+                pointA.getPosition().getZ() != pointB.getPosition().getZ()) {
+          samePerson = false;
+          break;
+        }
+      }
+    }
+
+    if (samePerson) {
+      Log.e("TAG", "Mesma pessoa");
+    } else {
+      Log.e("TAG", "Pessoas diferentes");
+    }
+
+  }
 
 }
