@@ -300,7 +300,6 @@ public class FaceMeshGraphic extends Graphic {
                           PointF3D point2,
                           PointF3D point3,
                           PointF3D point4) {
-    // Desenhar as linhas que formam o quadrado
     drawLine(canvas, point1, point2);
     drawLine(canvas, point2, point3);
     drawLine(canvas, point3, point4);
@@ -308,13 +307,11 @@ public class FaceMeshGraphic extends Graphic {
   }
 
   private void drawLineBetweenPoints(Canvas canvas, PointF3D point1, PointF3D point2) {
-    // Define a cor para a linha
     Paint linePaint = new Paint();
     linePaint.setColor(Color.RED);
     linePaint.setStyle(Style.STROKE);
     linePaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-    // Desenha a linha entre os dois pontos
     canvas.drawLine(
             translateX(point1.getX()),
             translateY(point1.getY()),
@@ -341,10 +338,8 @@ public class FaceMeshGraphic extends Graphic {
 
 
   public float convertPixelsToCm(float px) {
-    // Obtenha a densidade de pixels padrão do sistema (160 dpi)
     float density = Resources.getSystem().getDisplayMetrics().density;
 
-    // Calcule a conversão de pixels para centímetros
     float cm = px / (density * 160 / 2.54f);
 
     return cm;
@@ -382,12 +377,6 @@ public class FaceMeshGraphic extends Graphic {
           break;
         }
       }
-    }
-
-    if (samePerson) {
-      Log.e("TAG", "Mesma pessoa");
-    } else {
-      Log.e("TAG", "Pessoas diferentes");
     }
 
   }
