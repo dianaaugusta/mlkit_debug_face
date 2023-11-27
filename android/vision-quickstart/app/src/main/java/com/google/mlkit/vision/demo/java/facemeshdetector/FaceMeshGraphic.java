@@ -361,24 +361,22 @@ public class FaceMeshGraphic extends Graphic {
             positionPaint);
   }
 
-  public void samePersonVerification(List<FaceMeshPoint> pointsA, List<FaceMeshPoint> pointsB){
+  public boolean samePersonVerification(List<FaceMeshPoint> pointsA, List<FaceMeshPoint> pointsB){
     if (pointsA.size() != pointsB.size()) {
-      samePerson = false;
+      return false;
     } else {
       for (int i = 0; i < pointsA.size(); i++) {
         FaceMeshPoint pointA = pointsA.get(i);
         FaceMeshPoint pointB = pointsB.get(i);
 
-
-        if (pointA.getPosition().getX() != pointB.getPosition().getX() ||
-                pointA.getPosition().getY() != pointB.getPosition().getY() ||
-                pointA.getPosition().getZ() != pointB.getPosition().getZ()) {
-          samePerson = false;
-          break;
+        if (pointA.getPosition().getX() == pointB.getPosition().getX() ||
+                pointA.getPosition().getY() == pointB.getPosition().getY() ||
+                pointA.getPosition().getZ() == pointB.getPosition().getZ()) {
+           return true;
         }
       }
     }
-
+      return false;
   }
 
 }
