@@ -128,17 +128,32 @@ public class FaceMeshGraphic extends Graphic {
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, boxPaint);
 
+    RectF screenRect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
+
+    RectF insideFaceRect = new RectF(rect);
+
+    Paint outsideFacePaint = new Paint();
+    outsideFacePaint.setColor(Color.BLACK); // Cor de preenchimento desejada
+
+    RectF topRect = new RectF(screenRect.left, screenRect.top, screenRect.right, insideFaceRect.top);
+    canvas.drawRect(topRect, outsideFacePaint);
+
+    RectF bottomRect = new RectF(screenRect.left, insideFaceRect.bottom, screenRect.right, screenRect.bottom);
+    canvas.drawRect(bottomRect, outsideFacePaint);
+
+    RectF leftRect = new RectF(screenRect.left, insideFaceRect.top, insideFaceRect.left, insideFaceRect.bottom);
+    canvas.drawRect(leftRect, outsideFacePaint);
+
+    RectF rightRect = new RectF(insideFaceRect.right, insideFaceRect.top, screenRect.right, insideFaceRect.bottom);
+    canvas.drawRect(rightRect, outsideFacePaint);
+
+
     List<FaceMeshPoint> points = new ArrayList<>();
 
     if (!pointsDetected) {
-      // Draw face mesh e obtenha os pontos faciais
             points = useCase == USE_CASE_CONTOUR_ONLY ? getContourPoints(faceMesh) : faceMesh.getAllPoints();
 
-      // Verifica se os pontos foram detectados
       if (!points.isEmpty()) {
-        pointsDetected = true; // Marca que os pontos foram detectados
-
-        // Realiza a verificação apenas uma vez após a detecção dos pontos
         samePersonVerification(points, points);
         if(samePerson){
           canvas.drawText("Same Person" , 00F  * 1.5f,
