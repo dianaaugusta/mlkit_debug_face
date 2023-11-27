@@ -86,7 +86,7 @@ public final class LivePreviewActivity extends AppCompatActivity
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
-  private String selectedModel = OBJECT_DETECTION;
+  private String selectedModel = FACE_MESH_DETECTION;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -131,8 +131,10 @@ public final class LivePreviewActivity extends AppCompatActivity
     spinner.setAdapter(dataAdapter);
     spinner.setOnItemSelectedListener(this);
 
-    ToggleButton facingSwitch = findViewById(R.id.facing_switch);
-    facingSwitch.setOnCheckedChangeListener(this);
+
+
+      ToggleButton facingSwitch = findViewById(R.id.facing_switch);
+      facingSwitch.setOnCheckedChangeListener(this);
 
     ImageView settingsButton = findViewById(R.id.settings_button);
     settingsButton.setOnClickListener(
@@ -180,6 +182,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     // If there's no existing cameraSource, create one.
     if (cameraSource == null) {
       cameraSource = new CameraSource(this, graphicOverlay);
+      cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
     }
 
     try {
