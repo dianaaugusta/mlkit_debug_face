@@ -18,15 +18,12 @@ package com.google.mlkit.vision.demo.java;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,30 +42,22 @@ import com.google.mlkit.vision.demo.GraphicOverlay;
 import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshListener;
 import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshDetectorProcessor;
-import com.google.mlkit.vision.demo.java.facemeshdetector.PermissionUtil;
 import com.google.mlkit.vision.demo.preference.SettingsActivity;
 import com.google.mlkit.vision.facemesh.FaceMeshPoint;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 
 /** Live preview demo for ML Kit APIs. */
 @KeepName
 public final class LivePreviewActivity extends AppCompatActivity
     implements OnItemSelectedListener, CompoundButton.OnCheckedChangeListener , FaceMeshListener {
   private static final String FACE_MESH_DETECTION = "Face Mesh Detection (Beta)";
-  private static final String TEST = "Depth Map";
-  String fileName = "points"+ Random.class.getCanonicalName() + ".txt";
+  private static final String DEPTH_MAP = "Depth Map";
   private static final String TAG = "LivePreviewActivity";
 
   public List<FaceMeshPoint> pointList = new ArrayList<>();
@@ -116,7 +105,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     List<String> options = new ArrayList<>();
     options.add(FACE_MESH_DETECTION);
-    options.add(TEST);
+    options.add(DEPTH_MAP);
 
     // Creating adapter for spinner
     ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
