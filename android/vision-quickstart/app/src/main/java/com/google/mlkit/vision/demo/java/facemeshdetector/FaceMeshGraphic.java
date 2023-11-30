@@ -87,7 +87,6 @@ public class FaceMeshGraphic extends Graphic {
   FaceMeshGraphic( GraphicOverlay overlay, FaceMesh faceMesh) {
     super(overlay);
 
-
     this.faceMesh = faceMesh;
     final int selectedColor = Color.WHITE;
 
@@ -127,6 +126,8 @@ public class FaceMeshGraphic extends Graphic {
     rect.top = translateY(rect.top);
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, boxPaint);
+
+    int pref_depth_map = R.string.pref_depth_map;
 
     RectF screenRect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -190,7 +191,7 @@ public class FaceMeshGraphic extends Graphic {
     for (FaceMeshPoint point : points) {
       List<FaceMeshPoint> pointsA = points;
       List<FaceMeshPoint> pointsB = points;
-      Log.e("TAG", String.valueOf(points.size()));
+      //Log.e("TAG", String.valueOf(points.size()));
 
       updatePaintColorByZValue(
               positionPaint,
@@ -392,6 +393,10 @@ public class FaceMeshGraphic extends Graphic {
       }
     }
       return false;
+  }
+
+  public void downloadCSV(){
+    Log.e("ASDSADSA", "FUNFANDO");
   }
 
 }

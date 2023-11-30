@@ -55,11 +55,13 @@
     <item>Bounding Box Only</item>
     <item>Face Mesh</item>
     <item>Face Mesh(Simplified Contours only)</item>
+    <item>Depth Map</item>
   </string-array>
 
   <string-array name="pref_entry_values_face_mesh_use_case">
     <item>0</item>
     <item>1</item>
     <item>999</item>
+    <item>1000</item>
   </string-array>
 </resources>

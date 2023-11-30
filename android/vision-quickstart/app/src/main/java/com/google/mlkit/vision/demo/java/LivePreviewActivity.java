@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -37,6 +38,7 @@ import com.google.mlkit.vision.demo.GraphicOverlay;
 import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.java.barcodescanner.BarcodeScannerProcessor;
 import com.google.mlkit.vision.demo.java.facedetector.FaceDetectorProcessor;
+import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshGraphic;
 import com.google.mlkit.vision.demo.java.labeldetector.LabelDetectorProcessor;
 import com.google.mlkit.vision.demo.java.objectdetector.ObjectDetectorProcessor;
 import com.google.mlkit.vision.demo.java.posedetector.PoseDetectorProcessor;
@@ -105,6 +107,9 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
     Spinner spinner = findViewById(R.id.spinner);
+    Button btnDownload = findViewById(R.id.btn_download);
+
+
     List<String> options = new ArrayList<>();
     /*options.add(OBJECT_DETECTION);
     options.add(OBJECT_DETECTION_CUSTOM);
@@ -133,8 +138,8 @@ public final class LivePreviewActivity extends AppCompatActivity
 
 
 
-      ToggleButton facingSwitch = findViewById(R.id.facing_switch);
-      facingSwitch.setOnCheckedChangeListener(this);
+    ToggleButton facingSwitch = findViewById(R.id.facing_switch);
+    facingSwitch.setOnCheckedChangeListener(this);
 
     ImageView settingsButton = findViewById(R.id.settings_button);
     settingsButton.setOnClickListener(

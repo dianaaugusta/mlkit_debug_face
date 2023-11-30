@@ -17,6 +17,7 @@
 package com.google.mlkit.vision.demo.java.facemeshdetector;
 
 import android.content.Context;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.widget.Button;
 
@@ -45,6 +46,10 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
     FaceMeshDetectorOptions.Builder optionsBuilder = new FaceMeshDetectorOptions.Builder();
     if (PreferenceUtils.getFaceMeshUseCase(context) == FaceMeshDetectorOptions.BOUNDING_BOX_ONLY) {
       optionsBuilder.setUseCase(FaceMeshDetectorOptions.BOUNDING_BOX_ONLY);
+    }
+
+    if(PreferenceUtils.getFaceMeshUseCase(context) == 1000){
+      Log.e(TAG, "RECONHECI");
     }
 
     detector = FaceMeshDetection.getClient(optionsBuilder.build());

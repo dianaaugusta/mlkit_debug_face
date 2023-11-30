@@ -69,12 +69,23 @@
         android:textOff=""
         android:textOn=""/>
 
+    <ToggleButton
+        android:id="@+id/btn_download"
+        android:layout_width="2dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:background="@layout/toggle_style"
+        android:checked="false"
+        android:textOff=""
+        android:textOn="" />
+
     <Spinner
         android:id="@+id/spinner"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:layout_weight="1" />
 
   </LinearLayout>
 
