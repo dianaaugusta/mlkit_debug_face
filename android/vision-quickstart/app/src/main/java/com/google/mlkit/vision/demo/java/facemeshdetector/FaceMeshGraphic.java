@@ -25,6 +25,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.media.FaceDetector;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -66,6 +68,8 @@ public class FaceMeshGraphic extends Graphic {
   private float zMin;
   private float zMax;
 
+  public List<FaceMeshPoint> detectedPoints = new ArrayList<>();
+
   private GraphicOverlay graphicOverlay;
 
   @ContourType
@@ -103,7 +107,6 @@ public class FaceMeshGraphic extends Graphic {
     textPaint.setTextSize(40F);
     textPaint.setShadowLayer(5.0f, 0f, 0f, Color.BLACK);
 
-
     useCase = PreferenceUtils.getFaceMeshUseCase(getApplicationContext());
 
     graphicOverlay = overlay;
@@ -127,7 +130,6 @@ public class FaceMeshGraphic extends Graphic {
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, boxPaint);
 
-    int pref_depth_map = R.string.pref_depth_map;
 
     RectF screenRect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -167,18 +169,14 @@ public class FaceMeshGraphic extends Graphic {
     List<Triangle<FaceMeshPoint>> triangles = faceMesh.getAllTriangles();
 
     if (!pointsDetected && !points.isEmpty()) {
-      pointsDetected = true; // Marca que os pontos foram detectados
 
-      // Marca que a verificação não foi feita para permitir que ocorra uma vez
       verificationDone = false;
     }
 
-    // Verifica se a verificação de mesma pessoa já foi feita e se os pontos foram detectados
     if (!verificationDone && pointsDetected) {
       samePersonVerification(points, points);
       verificationDone = true;
     }
-
 
     zMin = Float.MAX_VALUE;
     zMax = Float.MIN_VALUE;
@@ -187,12 +185,13 @@ public class FaceMeshGraphic extends Graphic {
       zMax = max(zMax, point.getPosition().getZ());
     }
 
-    // Draw face mesh points
-    for (FaceMeshPoint point : points) {
-      List<FaceMeshPoint> pointsA = points;
-      List<FaceMeshPoint> pointsB = points;
-      //Log.e("TAG", String.valueOf(points.size()));
 
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      points.forEach(faceMeshPoint -> detectedPoints.add(faceMeshPoint));
+    }
+    Log.e("grafico maroto", String.valueOf(detectedPoints.size()));
+
+    for (FaceMeshPoint point : points) {
       updatePaintColorByZValue(
               positionPaint,
               canvas,

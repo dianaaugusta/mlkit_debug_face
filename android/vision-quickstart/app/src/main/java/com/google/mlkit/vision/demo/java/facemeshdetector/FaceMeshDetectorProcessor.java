@@ -18,6 +18,7 @@ package com.google.mlkit.vision.demo.java.facemeshdetector;
 
 import android.content.Context;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Button;
 
@@ -26,30 +27,38 @@ import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.demo.GraphicOverlay;
 import com.google.mlkit.vision.demo.R;
+import com.google.mlkit.vision.demo.java.LivePreviewActivity;
 import com.google.mlkit.vision.demo.java.VisionProcessorBase;
 import com.google.mlkit.vision.demo.preference.PreferenceUtils;
 import com.google.mlkit.vision.facemesh.FaceMesh;
 import com.google.mlkit.vision.facemesh.FaceMeshDetection;
 import com.google.mlkit.vision.facemesh.FaceMeshDetector;
 import com.google.mlkit.vision.facemesh.FaceMeshDetectorOptions;
+import com.google.mlkit.vision.facemesh.FaceMeshPoint;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /** Selfie Face Detector Demo. */
 public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh>> {
 
   private static final String TAG = "SelfieFaceProcessor";
-
+  private FaceMeshListener faceMeshListener;
   private final FaceMeshDetector detector;
 
-  public FaceMeshDetectorProcessor(Context context) {
+  public List<FaceMeshPoint> pointsDetected = new ArrayList<>();
+
+  public FaceMeshDetectorProcessor(Context context, FaceMeshListener listener) {
     super(context);
+    this.faceMeshListener = listener;
+
     FaceMeshDetectorOptions.Builder optionsBuilder = new FaceMeshDetectorOptions.Builder();
     if (PreferenceUtils.getFaceMeshUseCase(context) == FaceMeshDetectorOptions.BOUNDING_BOX_ONLY) {
       optionsBuilder.setUseCase(FaceMeshDetectorOptions.BOUNDING_BOX_ONLY);
     }
 
     if(PreferenceUtils.getFaceMeshUseCase(context) == 1000){
-      Log.e(TAG, "RECONHECI");
+      Log.e(TAG, "RECONHECI" + pointsDetected.size());
     }
 
     detector = FaceMeshDetection.getClient(optionsBuilder.build());
@@ -69,14 +78,25 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
   @Override
   protected void onSuccess(
       @NonNull List<FaceMesh> faces, @NonNull GraphicOverlay graphicOverlay) {
+    List<FaceMeshPoint> pointsDetected = new ArrayList<>();
     for (FaceMesh face : faces) {
-
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        List<FaceMeshPoint> facePoints = face.getAllPoints();
+        pointsDetected.addAll(facePoints);
+      }
       graphicOverlay.add(new FaceMeshGraphic(graphicOverlay, face));
     }
+
+    if (!pointsDetected.isEmpty() && faceMeshListener != null) {
+      faceMeshListener.onFaceMeshDetected(pointsDetected);
+    }
   }
+
+
 
   @Override
   protected void onFailure(@NonNull Exception e) {
     Log.e(TAG, "Face detection failed " + e);
   }
+
 }

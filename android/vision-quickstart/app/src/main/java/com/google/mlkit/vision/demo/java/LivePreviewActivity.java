@@ -39,6 +39,7 @@ import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.java.barcodescanner.BarcodeScannerProcessor;
 import com.google.mlkit.vision.demo.java.facedetector.FaceDetectorProcessor;
 import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshGraphic;
+import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshListener;
 import com.google.mlkit.vision.demo.java.labeldetector.LabelDetectorProcessor;
 import com.google.mlkit.vision.demo.java.objectdetector.ObjectDetectorProcessor;
 import com.google.mlkit.vision.demo.java.posedetector.PoseDetectorProcessor;
@@ -47,6 +48,8 @@ import com.google.mlkit.vision.demo.java.facemeshdetector.FaceMeshDetectorProces
 import com.google.mlkit.vision.demo.java.textdetector.TextRecognitionProcessor;
 import com.google.mlkit.vision.demo.preference.PreferenceUtils;
 import com.google.mlkit.vision.demo.preference.SettingsActivity;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.facemesh.FaceMeshPoint;
 import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions;
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions;
@@ -64,7 +67,7 @@ import java.util.List;
 /** Live preview demo for ML Kit APIs. */
 @KeepName
 public final class LivePreviewActivity extends AppCompatActivity
-    implements OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
+    implements OnItemSelectedListener, CompoundButton.OnCheckedChangeListener , FaceMeshListener {
   private static final String OBJECT_DETECTION = "Object Detection";
   private static final String OBJECT_DETECTION_CUSTOM = "Custom Object Detection";
   private static final String CUSTOM_AUTOML_OBJECT_DETECTION =
@@ -82,12 +85,15 @@ public final class LivePreviewActivity extends AppCompatActivity
   private static final String TEXT_RECOGNITION_JAPANESE = "Text Recognition Japanese";
   private static final String TEXT_RECOGNITION_KOREAN = "Text Recognition Korean";
   private static final String FACE_MESH_DETECTION = "Face Mesh Detection (Beta)";
+  private static final String TEST = "Depth Map";
 
   private static final String TAG = "LivePreviewActivity";
 
+  public List<FaceMeshPoint> pointList = new ArrayList<>();
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
+
   private String selectedModel = FACE_MESH_DETECTION;
 
   @Override
@@ -109,24 +115,19 @@ public final class LivePreviewActivity extends AppCompatActivity
     Spinner spinner = findViewById(R.id.spinner);
     Button btnDownload = findViewById(R.id.btn_download);
 
+    btnDownload.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Log.e("marotinho", String.valueOf(pointList.size()));
+      }
+    });
+
 
     List<String> options = new ArrayList<>();
-    /*options.add(OBJECT_DETECTION);
-    options.add(OBJECT_DETECTION_CUSTOM);
-    options.add(CUSTOM_AUTOML_OBJECT_DETECTION);
-    options.add(FACE_DETECTION);
-    options.add(BARCODE_SCANNING);
-    options.add(IMAGE_LABELING);
-    options.add(IMAGE_LABELING_CUSTOM);
-    options.add(CUSTOM_AUTOML_LABELING);
-    options.add(POSE_DETECTION);
-    options.add(SELFIE_SEGMENTATION);
-    options.add(TEXT_RECOGNITION_LATIN);
-    options.add(TEXT_RECOGNITION_CHINESE);
-    options.add(TEXT_RECOGNITION_DEVANAGARI);
-    options.add(TEXT_RECOGNITION_JAPANESE);
-    options.add(TEXT_RECOGNITION_KOREAN);*/
     options.add(FACE_MESH_DETECTION);
+    options.add(TEST);
+
+
 
     // Creating adapter for spinner
     ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
@@ -135,8 +136,6 @@ public final class LivePreviewActivity extends AppCompatActivity
     // attaching data adapter to spinner
     spinner.setAdapter(dataAdapter);
     spinner.setOnItemSelectedListener(this);
-
-
 
     ToggleButton facingSwitch = findViewById(R.id.facing_switch);
     facingSwitch.setOnCheckedChangeListener(this);
@@ -307,7 +306,10 @@ public final class LivePreviewActivity extends AppCompatActivity
           cameraSource.setMachineLearningFrameProcessor(new SegmenterProcessor(this));
           break; */
         case FACE_MESH_DETECTION:
-          cameraSource.setMachineLearningFrameProcessor(new FaceMeshDetectorProcessor(this));
+          FaceMeshDetectorProcessor processor = new FaceMeshDetectorProcessor(this, LivePreviewActivity.this);
+          Log.e(TAG, "cheguei aqui" + processor.pointsDetected);
+
+          cameraSource.setMachineLearningFrameProcessor(new FaceMeshDetectorProcessor(this, LivePreviewActivity.this));
           break;
         default:
           Log.e(TAG, "Unknown model: " + model);
@@ -367,4 +369,10 @@ public final class LivePreviewActivity extends AppCompatActivity
       cameraSource.release();
     }
   }
+
+  @Override
+  public void onFaceMeshDetected(List<FaceMeshPoint> pointsDetected) {
+
+  }
+
 }

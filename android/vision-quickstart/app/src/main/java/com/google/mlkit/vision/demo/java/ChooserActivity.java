@@ -43,7 +43,7 @@ public final class ChooserActivity extends AppCompatActivity
   private static final Class<?>[] CLASSES =
       VERSION.SDK_INT < VERSION_CODES.LOLLIPOP
           ? new Class<?>[] {
-            LivePreviewActivity.class, StillImageActivity.class,
+            LivePreviewActivity.class
           }
           : new Class<?>[] {
             LivePreviewActivity.class,
