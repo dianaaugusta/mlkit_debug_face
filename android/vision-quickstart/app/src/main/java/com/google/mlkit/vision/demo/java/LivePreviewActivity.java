@@ -16,6 +16,7 @@
 
 package com.google.mlkit.vision.demo.java;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -59,15 +60,36 @@ public final class LivePreviewActivity extends AppCompatActivity
   private static final String FACE_MESH_DETECTION = "Face Mesh Detection (Beta)";
   private static final String DEPTH_MAP = "Depth Map";
   private static final String TAG = "LivePreviewActivity";
+  boolean isTrigger = false;
 
   public List<FaceMeshPoint> pointList = new ArrayList<>();
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
 
+  int countedRepeatedDetections = 0;
+
   String meshPoints = "";
   private GraphicOverlay graphicOverlay;
 
   private String selectedModel = FACE_MESH_DETECTION;
+
+  @Override
+  public void onFaceMeshDetected(List<FaceMeshPoint> pointsDetected) {
+    while (isTrigger && pointList.size() <= 468){
+      pointList.addAll(pointsDetected);
+      Log.e("pointlist", String.valueOf(pointList.size()));
+
+      for (int i = 0; i < 468; i++) {
+        FaceMeshPoint point = pointList.get(i);
+        meshPoints += (point.getPosition().getX()) + ",";
+        meshPoints += (point.getPosition().getY()) + ",";
+        meshPoints += (point.getPosition().getZ()) + ",";
+        meshPoints += "\n";
+      }
+
+      createFile();
+    }
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -85,20 +107,25 @@ public final class LivePreviewActivity extends AppCompatActivity
       Log.d(TAG, "graphicOverlay is null");
     }
 
+    @SuppressLint("CutPasteId") ToggleButton toggleButton  = findViewById(R.id.facing_switch);
     Spinner spinner = findViewById(R.id.spinner);
     Button btnDownload = findViewById(R.id.btn_download);
+
+    toggleButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        isTrigger = true;
+      }
+    });
+
+    Log.e("ANTES DO CLIQUE" , String.valueOf(pointList.size()));
 
     btnDownload.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        for(FaceMeshPoint point : pointList){
-          meshPoints += point.getPosition().getX();
-          meshPoints += point.getPosition().getY();
-          meshPoints += point.getPosition().getZ();
-          meshPoints += "\n";
-        }
 
-        createFile();
+          int numberOfIterations = pointList.size() / countedRepeatedDetections;
+          int remainingPoints = pointList.size() % countedRepeatedDetections;
       }
     });
 
@@ -152,8 +179,6 @@ public final class LivePreviewActivity extends AppCompatActivity
     if (cameraSource != null) {
       if (isChecked) {
         cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
-      } else {
-        cameraSource.setFacing(CameraSource.CAMERA_FACING_BACK);
       }
     }
     preview.stop();
@@ -229,10 +254,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
   }
 
-  @Override
-  public void onFaceMeshDetected(List<FaceMeshPoint> pointsDetected) {
-    pointList.addAll(pointsDetected);
-  }
+
 
   // create text file
   private void createFile() {
@@ -253,7 +275,7 @@ public final class LivePreviewActivity extends AppCompatActivity
       switch (resultCode) {
         case Activity.RESULT_OK:
           if (data != null && data.getData() != null) {
-            writeInFile(data.getData(), meshPoints);
+            writeInFile(data.getData(), meshPoints.toString());
           }
           break;
         case Activity.RESULT_CANCELED:
